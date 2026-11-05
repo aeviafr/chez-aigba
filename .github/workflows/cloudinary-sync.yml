@@ -1,0 +1,32 @@
+name: Sync photos to Cloudinary
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Images/**'
+      - 'scripts/sync_cloudinary.py'
+      - '.github/workflows/cloudinary-sync.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  upload-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Install Cloudinary SDK
+        run: python -m pip install cloudinary
+      - name: Upload photos
+        env:
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+        run: python scripts/sync_cloudinary.py
